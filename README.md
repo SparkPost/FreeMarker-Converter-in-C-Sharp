@@ -10,10 +10,8 @@ This is a utility to convert FreeMarker templates to SparkPost templates.
 1) Install Git if it is not already installed
 2) Clone this repo
 3) Place FreeMarker templates for conversion into the INBOX folder
-4) Execute the fm2sp.php script *
+4) Execute the program.cs script 
 5) Collect the converted templates from the OUTBOX folder
-* If you want to run automatically, add the conversion script to a cron job.  
-  IE:  root /usr/bin/php /usr/local/bin/fm_converter/fm2sp.php >> /var/log/fm2sp.log
 
 
 == Usage ==
