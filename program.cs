@@ -13,7 +13,7 @@ namespace dirlister
             string introDoc = @"
 This application converts FreeMarker templates into SparkPost templates. 
 Place any existing FreeMarker templates into the application INBOX, 
-then run the application.  Converted templates will appear in teh OUTBOX.
+then run the application.  Converted templates will appear in the OUTBOX.
 
              ";
             Console.WriteLine("{0}", introDoc);
@@ -27,10 +27,10 @@ then run the application.  Converted templates will appear in teh OUTBOX.
             try
             {
                 string[] dirs = Directory.GetDirectories(@appPath, "*", SearchOption.TopDirectoryOnly);
-              //  Console.WriteLine("There are {0} directories here.", dirs.Length);
+                //  Console.WriteLine("There are {0} directories here.", dirs.Length);
                 foreach (string dir in dirs)
                 {
-                   // Console.WriteLine(dir);
+                    // Console.WriteLine(dir);
                 }
             }
             catch (Exception e)
@@ -62,15 +62,15 @@ then run the application.  Converted templates will appear in teh OUTBOX.
                     // This path is a file
                     ProcessFile(path, appPath);
                 }
-                 else if(Directory.Exists(path)) 
+                else if (Directory.Exists(path))
                 {
-                // This path is a directory
-                  ProcessDirectory(path, appPath);
+                    // This path is a directory
+                    ProcessDirectory(path, appPath);
                 }
-                 else 
-                 {
-                     Console.WriteLine("{0} is not a valid file or directory.", path);
-                 }        
+                else
+                {
+                    Console.WriteLine("{0} is not a valid file or directory.", path);
+                }
             }
         }
 
@@ -107,23 +107,108 @@ then run the application.  Converted templates will appear in teh OUTBOX.
                 // Here is the real meat of the application
                 // Run the regex rules on it
                 // Add all regex replacement rules here
-                //text = text.Replace("test", "solution");
 
-                // Replace plain Variables ()
-                Regex rgx = new Regex("\\$\\{(.*)\\}");
-                text = rgx.Replace(text, "{{$1}}");
 
+
+                // Collect all the in-line assignments into one array
+                string @assignments = "substitution_data\": {\r\n";
+                string pattern = @"<#(assign.*)/>";
+                foreach (Match match in Regex.Matches(text, pattern))
+                {
+                    //Console.WriteLine("Found '{0}' at position {1}", match.Value, match.Index);
+                    assignments = assignments + match.Value;
+                }
+                assignments = assignments.Replace("<#assign ", "\"");
+                assignments = assignments.Replace(" />", "\",\r\n");
+                assignments = assignments.Replace("/>", "\",\r\n");
+                assignments = assignments.Replace("[0]!\"\"", "");
+                assignments = assignments.Replace("=", "\":\"");
+
+                //remove last comma
+                assignments = assignments.Trim(',');
+
+                // finish off the substitutions stanza
+                assignments = assignments + "},";
+
+
+                Regex rgx;
+
+                // Remove all in-line assignments
+                rgx = new Regex("<#(assign.*)/>");
+                text = rgx.Replace(text, "");
+
+                // Replace if conditions
+                rgx = new Regex(@"<#if(.*)>([\s\n\r]*)(.*)([\s\n\r]*)</#if>");
+                text = rgx.Replace(text, "\r\n{{if $1}}\r\n  $3 \r\n{{end}");
+
+                // Replace foreach iterations
+                rgx = new Regex(@"<#(.*) as (.*)>([\s\n\r]*)(.*)([\s\n\r]*)</#(.*)>");
+                text = rgx.Replace(text, "\r\n{{each $1}}\r\n  $4 \r\n{{end}");
+
+                // Replace empty variable condition
+                rgx = new Regex("(\\[0\\]\\!\"\")");
+                text = rgx.Replace(text, "");
+
+                // Replace plain Variables (Interpolations)
+                rgx = new Regex("\\$\\{(\\w*)");
+                text = rgx.Replace(text, "{{$1}");
+
+                // Replace comments
+                rgx = new Regex(@"<#--(\w*)");
+                text = rgx.Replace(text, "<!-- $1");
+
+
+                string rawtext = "Use an HTML reader to view this message";
+                string newTemplate = @"{
+'options': {
+    'open_tracking': true,
+    'click_tracking': true,
+    'transactional': false,
+    'sandbox': false,
+    'ip_pool': 'sp_shared',
+    'inline_css': false
+  },
+  'description': 'n.description',
+  'campaign_id': 'n.campaign',
+  'metadata': {
+            },
+" + assignments + @"
+  'recipients': [
+    {
+      'address': {
+        'email': 'n.address.email',
+        'name': 'n.address.fullname'
+      },
+      'tags': [],
+      'metadata': {},
+      'substitution_data': {}
+    }
+  ],
+  'content': {
+    'from': {
+      'name': 'r.fromName',
+      'email': 'r.fromEmail'
+    },
+    'subject': 'r.subject',
+    'reply_to': 'r.replyAddress',
+     'text': '" + rawtext + @"',
+    'html': '" + text + @"'
+  }
+}";
 
                 /**************************************************************/
 
                 // Save it to the OUTBOX
-                File.WriteAllText(appPath + "/OUTBOX/" + result, text);
+                File.WriteAllText(appPath + "/OUTBOX/" + result + ".json", newTemplate);
 
                 // Mark original file as "read"
-                File.Move(path, path + ".read");
+                // commeted temporarily for debugging
+          //      File.Move(path, path + ".read");
 
                 // Report / Log the activity
-                Console.WriteLine("Processed file '{0}' into the OUTBOX.", result);
+                Console.WriteLine("Processed file '{0}' into the OUTBOX.", result + ".json");
+            //    Console.WriteLine("{0}", @assignments);
+
             }
             else { 
                 Console.WriteLine("Already processed file '{0}'.", result);
