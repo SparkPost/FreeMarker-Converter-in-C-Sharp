@@ -24,21 +24,20 @@ When converted to SparkPost template placeholders, they become
 
 {{Recipient.lead.firstname}}  ,  {{Gears.unsubscribe}}
 
+<PRE>
 More complex conversions are also possible.  The current version will operate on the following:
  - Basic substitutions
  
-
-
- /* look for these to replace
+look for these to replace
 FreeMarker support logical operators:
-Logical or: ||
-Logical and: &&
-Logical not: !
+  Logical or: ||
+  Logical and: &&
+  Logical not: !
 
 There are FLAGS, INTERPOLATONS, and COMMENTS to account for.
-FLAGS = <#action ... >
-COMMENTS=  <#-- comment -->
-INTERPOLATION = ${variable}
+  FLAGS = <#action ... >
+  COMMENTS=  <#-- comment -->
+  INTERPOLATION = ${variable}
 
 Samples of FLAGS are:
 <#list ...>
@@ -55,43 +54,9 @@ Samples of INTERPOLATION are:
   IE: ${Recipient.lead.firstname[0]!""}
   ^^ in other words, Recipient firstname first character is NOT == ""
   
+Turn "assignments into substitution vars. IE:  
+  <#assign countrycontact=Recipient.contact.pv_landenid[0]!"" />
+  BECOMES...
+  "substitution_data" : {"countrycontact" :"Recipient.contact.pv_landenid"}
   
-<#assign countrycontact=Recipient.contact.pv_landenid[0]!"" />
-<#assign countryaccount=Recipient.account.pv_landcodeid[0]!"" />
-<#assign countrylead=Recipient.lead.pv_landcodeid[0]!"" />
-<#assign utmnamecontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.kl_utmname[0]!"" />
-<#assign utmnameaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.kl_utmname[0]!""/>
-<#assign utmnamelead=Recipient.lead.kl_verkoper_trucks_id.systemuser.kl_utmname[0]!"" />
-${countrycontact}
-${countrylead}
-${countryaccount}
-${utmnamecontact}
-${utmnameaccount}
-${utmnamelead}
-${Recipient.EncryptedEmail}
-<#assign firstnamecontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.firstname[0]!""/>\
-<#assign firstnameaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.firstname[0]!""/>
-<#assign firstnamelead=Recipient.lead.kl_verkoper_trucks_id.systemuser.firstname[0]!""/>
-<#assign photourlcontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.photourl[0]!""/>
-<#assign photourlaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.photourl[0]!""/>
-<#assign photourllead=Recipient.lead.kl_verkoper_trucks_id.systemuser.photourl[0]!""/>
-<#assign emailcontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.internalemailaddress[0]!""/>
-<#assign emailaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.internalemailaddress[0]!""/>
-<#assign emaillead=Recipient.lead.kl_verkoper_trucks_id.systemuser.internalemailaddress[0]!""/>
-<#assign phonenumbercontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.address1_telephone1[0]!""/>
-<#assign phonenumberaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.address1_telephone1[0]!""/>
-<#assign phonenumberlead=Recipient.lead.kl_verkoper_trucks_id.systemuser.address1_telephone1[0]!""/>
-<#assign skypecontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.kl_skype[0]!""/>
-<#assign skypeaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.kl_skype[0]!""/>
-<#assign skypelead=Recipient.lead.kl_verkoper_trucks_id.systemuser.kl_skype[0]!""/>
-<#assign twittercontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.kl_twitter[0]!""/>
-<#assign twitteraccount=Recipient.account.kl_verkoper_trucks_id.systemuser.kl_twitter[0]!""/>
-<#assign twitterlead=Recipient.lead.kl_verkoper_trucks_id.systemuser.kl_twitter[0]!""/>
-<#assign linkedincontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.kl_linkedin[0]!""/>
-<#assign linkedinaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.kl_linkedin[0]!""/>
-<#assign linkedinlead=Recipient.lead.kl_verkoper_trucks_id.systemuser.kl_linkedin[0]!""/>
-<#assign facebookcontact=Recipient.contact.kl_verkoper_trucks_id.systemuser.kl_facebook[0]!""/>
-<#assign facebookaccount=Recipient.account.kl_verkoper_trucks_id.systemuser.kl_facebook[0]!""/>
-<#assign facebooklead=Recipient.lead.kl_verkoper_trucks_id.systemuser.kl_facebook[0]!""/> 
-*/
-  
+</PRE>
