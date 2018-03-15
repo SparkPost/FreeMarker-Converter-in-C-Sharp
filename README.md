@@ -34,7 +34,7 @@ FreeMarker support logical operators:
   Logical and: &&
   Logical not: !
 
-There are FLAGS, INTERPOLATONS, and COMMENTS to account for.
+There are FLAGS, INTERPOLATIONS, and COMMENTS to account for.
   FLAGS = <#action ... >
   COMMENTS=  <#-- comment -->
   INTERPOLATION = ${variable}
